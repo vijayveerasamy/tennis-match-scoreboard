@@ -33,8 +33,22 @@ public class TennisMatchServiceImpl implements TennisMatchService {
 
     }
 
-    private void playerScored(TennisGame tennisGameA, TennisGame tennisGameB, Boolean playerA) {
-        if (playerA) {
+    public Boolean isItTieBreakSet(TennisSet tennisSetA, TennisSet tennisSetB) {
+        return tennisSetA.getTieBreak() && tennisSetB.getTieBreak();
+    }
+
+    public Boolean isItFifthSet(List<TennisSet> tennisSetsA, List<TennisSet> tennisSetsB) {
+
+        Long validSetsA = tennisSetsA.stream().filter(s -> s.getSetStatus()!=TennisSetStatus.Tied).count();
+
+        Long validSetsB = tennisSetsB.stream().filter(s -> s.getSetStatus()!=TennisSetStatus.Tied).count();
+
+        if (validSetsA==validSetsB && validSetsA==5 && validSetsB==5) return true;
+        else return false;
+    }
+
+    private void playerScored(TennisGame tennisGameA, TennisGame tennisGameB, Integer playerA) {
+        if (playerA%2==0) {
             if( TennisMatchUtil.playerBAtAdvantage(tennisGameA.getCurrentScore(), tennisGameB.getCurrentScore()) ) {
                 tennisGameB.setCurrentScore(
                         TennisScoreUtil.getScorePositionToValue(
@@ -59,11 +73,22 @@ public class TennisMatchServiceImpl implements TennisMatchService {
         }
     }
 
+    public boolean checkSetTiedAndUpdate(final List<TennisGame> playerAGames, final List<TennisGame> playerBGames) {
+
+        if (TennisMatchUtil.setWasTied(playerAGames, playerBGames)) {
+            tennisMatch.getCurrentSet(tennisMatch.getPlayerA()).setSetStatus(TennisSetStatus.Tied);
+            tennisMatch.getCurrentSet(tennisMatch.getPlayerB()).setSetStatus(TennisSetStatus.Tied);
+            return true;
+        }
+
+        return false;
+    }
+
     public Boolean checkPlayerWonSetAndUpdateStatus(final List<TennisGame> playerAGames, final List<TennisGame> playerBGames) {
 
         Boolean playerAWonSet = TennisMatchUtil.playerAWonSet(playerAGames, playerBGames);
 
-        Boolean playerBWonSet = TennisMatchUtil.playerAWonSet(playerAGames, playerBGames);
+        Boolean playerBWonSet = TennisMatchUtil.playerBWonSet(playerAGames, playerBGames);
 
         if( playerAWonSet || playerAWonSet ) {
 
@@ -71,7 +96,7 @@ public class TennisMatchServiceImpl implements TennisMatchService {
                 tennisMatch.getCurrentSet(tennisMatch.getPlayerA()).setSetStatus(TennisSetStatus.Won);
                 tennisMatch.getCurrentSet(tennisMatch.getPlayerB()).setSetStatus(TennisSetStatus.Lost);
             }
-            else if (playerAWonSet) {
+            else if (playerBWonSet) {
                 tennisMatch.getCurrentSet(tennisMatch.getPlayerA()).setSetStatus(TennisSetStatus.Lost);
                 tennisMatch.getCurrentSet(tennisMatch.getPlayerB()).setSetStatus(TennisSetStatus.Won);
             }
@@ -86,46 +111,54 @@ public class TennisMatchServiceImpl implements TennisMatchService {
     @Override
     public void startMatch() {
 
-        while (tennisMatch.getTennisSets().size()<=5) {
+        Boolean tieBreakRequest = false;
+
+        do {
 
             TennisSet tennisSetA = new TennisSet();
             TennisSet tennisSetB = new TennisSet();
 
+            tennisSetA.setTieBreak(tieBreakRequest);
+            tennisSetB.setTieBreak(tieBreakRequest);
+            tieBreakRequest = false;
+
             tennisMatch.addCurrentSet(tennisMatch.getPlayerA(), tennisSetA);
             tennisMatch.addCurrentSet(tennisMatch.getPlayerB(), tennisSetB);
 
-            while ( tennisMatch.getCurrentSet(tennisMatch.getPlayerA()).getSetStatus().equals(TennisSetStatus.InProgress) &&
-                    tennisMatch.getCurrentSet(tennisMatch.getPlayerB()).getSetStatus().equals(TennisSetStatus.InProgress))  {
+            while ( tennisSetA.getSetStatus().equals(TennisSetStatus.InProgress) &&
+                    tennisSetB.getSetStatus().equals(TennisSetStatus.InProgress))  {
 
                 TennisGame tennisGameA = new TennisGame();
                 TennisGame tennisGameB = new TennisGame();
 
-                tennisMatch.getCurrentSet(tennisMatch.getPlayerA()).addCurentGame(tennisGameA);
-                tennisMatch.getCurrentSet(tennisMatch.getPlayerB()).addCurentGame(tennisGameB);
+                tennisSetA.addCurentGame(tennisGameA);
+                tennisSetB.addCurentGame(tennisGameB);
 
                 while ( !TennisMatchUtil.playerAWonGame(tennisGameA.getCurrentScore(), tennisGameB.getCurrentScore()) &&
                         !TennisMatchUtil.playerBWonGame(tennisGameA.getCurrentScore(), tennisGameB.getCurrentScore()) ) {
 
-                    playerScored(tennisGameA, tennisGameB, TennisMatchUtil.getRandomBoolean());
+                    playerScored(tennisGameA, tennisGameB, TennisMatchUtil.getRandomNumber());
                 }
 
-                //TBD
-                //check tied match
-                //check tie-brak match
-                //5th set no-tie -break check
+                if ( checkSetTiedAndUpdate(tennisSetA.getGames(),
+                        tennisSetB.getGames()) &&
+                        !isItTieBreakSet(tennisSetA, tennisSetB) &&
+                        !isItFifthSet(tennisMatch.getPlayerTennisSets(tennisMatch.getPlayerA()),
+                                tennisMatch.getPlayerTennisSets(tennisMatch.getPlayerB())) ) {
 
-                if ( checkPlayerWonSetAndUpdateStatus(tennisMatch.getCurrentSet(tennisMatch.getPlayerA()).getGames(),
-                        tennisMatch.getCurrentSet(tennisMatch.getPlayerB()).getGames()) ) {
+                    tieBreakRequest = true;
+
                     break;
                 }
-                if (TennisMatchUtil.setWasTied(tennisMatch.getCurrentSet(tennisMatch.getPlayerA()).getGames(),
-                        tennisMatch.getCurrentSet(tennisMatch.getPlayerB()).getGames()) ) {
 
+                if ( checkPlayerWonSetAndUpdateStatus(tennisSetA.getGames(),
+                        tennisSetB.getGames()) ) {
+                    break;
                 }
-
             }
 
-        }
+        } while (!isItFifthSet(tennisMatch.getPlayerTennisSets(tennisMatch.getPlayerA()),
+        tennisMatch.getPlayerTennisSets(tennisMatch.getPlayerB())));
 
     }
 

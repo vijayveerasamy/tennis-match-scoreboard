@@ -13,6 +13,10 @@ public class TennisMatchUtil {
         return random.nextBoolean();
     }
 
+    public static Integer getRandomNumber() {
+        return random.nextInt();
+    }
+
     public static boolean playerAAtDeuce(final Integer playerAScore, final Integer playerBScore) {
 
         if (playerAScore == 40 && TennisScoreUtil.getScoreValueToPosition(playerAScore) == TennisScoreUtil.getScoreValueToPosition(playerBScore) + 1)
@@ -63,13 +67,13 @@ public class TennisMatchUtil {
 
     public static boolean setWasTied(final List<TennisGame> playerAGames, final List<TennisGame> playerBGames) {
 
-        long playASetsWonCount = playerAGames.stream().filter(g -> g.getCurrentScore()==50).count();
-        long playBSetsWonCount = playerAGames.stream().filter(g -> g.getCurrentScore()==50).count();
+        Long playAGamesWonCount = playerAGames.stream().filter(g -> g.getCurrentScore()==50).count();
+        Long playBGamesWonCount = playerAGames.stream().filter(g -> g.getCurrentScore()==50).count();
 
-        if( playASetsWonCount==7 && playBSetsWonCount==6 && (playASetsWonCount-playBSetsWonCount<2) ) {
+        if( playAGamesWonCount==7 && playBGamesWonCount==6 && (playAGamesWonCount-playBGamesWonCount<2) ) {
             return true;
         }
-        else if( playASetsWonCount==6 && playBSetsWonCount==7 && (playBSetsWonCount-playASetsWonCount<2) ) {
+        else if( playAGamesWonCount==6 && playBGamesWonCount==7 && (playBGamesWonCount-playAGamesWonCount<2) ) {
             return true;
         }
 
@@ -78,10 +82,10 @@ public class TennisMatchUtil {
 
     public static boolean playerAWonSet(final List<TennisGame> playerAGames, final List<TennisGame> playerBGames) {
 
-        long playASetsWonCount = playerAGames.stream().filter(g -> g.getCurrentScore()==50).count();
-        long playBSetsWonCount = playerBGames.stream().filter(g -> g.getCurrentScore()==50).count();
+        long playAGamesWonCount = playerAGames.stream().filter(g -> g.getCurrentScore()==50).count();
+        long playBGamesWonCount = playerBGames.stream().filter(g -> g.getCurrentScore()==50).count();
 
-        if( playASetsWonCount>=6 && (playASetsWonCount-playBSetsWonCount>=2) ) {
+        if( playAGamesWonCount>=6 && (playAGamesWonCount-playBGamesWonCount>=2) ) {
             return true;
         }
 
@@ -90,13 +94,14 @@ public class TennisMatchUtil {
 
     public static boolean playerBWonSet(final List<TennisGame> playerAGames, final List<TennisGame> playerBGames) {
 
-        long playASetsWonCount = playerAGames.stream().filter(g -> g.getCurrentScore()==50).count();
-        long playBSetsWonCount = playerAGames.stream().filter(g -> g.getCurrentScore()==50).count();
+        long playAGamesWonCount = playerAGames.stream().filter(g -> g.getCurrentScore()==50).count();
+        long playBGamesWonCount = playerAGames.stream().filter(g -> g.getCurrentScore()==50).count();
 
-        if( playBSetsWonCount>=6 && (playBSetsWonCount-playASetsWonCount>=2) ) {
+        if( playBGamesWonCount>=6 && (playBGamesWonCount-playAGamesWonCount>=2) ) {
             return true;
         }
 
         return false;
     }
+
 }

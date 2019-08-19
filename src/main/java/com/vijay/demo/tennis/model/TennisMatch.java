@@ -22,18 +22,24 @@ public class TennisMatch {
         return tennisSets;
     }
 
-    public TennisSet getCurrentSet(final String player) {
-        return tennisSets.get(player).get(tennisSets.get(player).size()-1);
+    public List<TennisSet> getPlayerTennisSets(String player) {
+        return tennisSets.get(player);
     }
 
-    public void setCurrentSet(final String player, final TennisSet tennisSet) {
-        tennisSets.get(player).set(tennisSets.get(player).size() - 1, tennisSet);
+    public TennisSet getCurrentSet(final String player) {
+        return tennisSets.get(player).get((int)tennisSets.get(player).stream().count() -1);
     }
 
     public void addCurrentSet(final String player, final TennisSet tennisSet) {
-        tennisSets.putIfAbsent(player, new ArrayList() {{
-            add(tennisSet);
-        }});
+
+        if(tennisSets.containsKey(player)) {
+            tennisSets.get(player).add(tennisSet);
+        }
+        else {
+            tennisSets.put(player, new ArrayList() {{
+                add(tennisSet);
+            }});
+        };
     }
 
     public String getPlayerA() {

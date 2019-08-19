@@ -8,6 +8,8 @@ public class TennisSet {
 
     private TennisSetStatus setStatus = TennisSetStatus.InProgress;
 
+    private Boolean tieBreak = false;
+
     public List<TennisGame> getGames() {
         return games;
     }
@@ -30,5 +32,13 @@ public class TennisSet {
 
     public void setSetStatus(TennisSetStatus setStatus) {
         this.setStatus = setStatus;
+    }
+
+    public Boolean getTieBreak() {
+        return tieBreak;
+    }
+
+    public void setTieBreak(Boolean tieBreak) {
+        this.tieBreak = tieBreak;
     }
 }
