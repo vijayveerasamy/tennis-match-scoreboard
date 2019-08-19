@@ -47,8 +47,8 @@ public class TennisMatchServiceImpl implements TennisMatchService {
         else return false;
     }
 
-    private void playerScored(TennisGame tennisGameA, TennisGame tennisGameB, Integer playerA) {
-        if (playerA%2==0) {
+    private void playerScored(TennisGame tennisGameA, TennisGame tennisGameB, Integer random) {
+        if (random%2!=0) {
             if( TennisMatchUtil.playerBAtAdvantage(tennisGameA.getCurrentScore(), tennisGameB.getCurrentScore()) ) {
                 tennisGameB.setCurrentScore(
                         TennisScoreUtil.getScorePositionToValue(
@@ -84,21 +84,21 @@ public class TennisMatchServiceImpl implements TennisMatchService {
         return false;
     }
 
-    public Boolean checkPlayerWonSetAndUpdateStatus(final List<TennisGame> playerAGames, final List<TennisGame> playerBGames) {
+    public Boolean checkPlayerWonSetAndUpdateStatus(final TennisSet playerASet, final TennisSet playerBSet) {
 
-        Boolean playerAWonSet = TennisMatchUtil.playerAWonSet(playerAGames, playerBGames);
+        Boolean playerAWonSet = TennisMatchUtil.playerAWonSet(playerASet.getGames(), playerBSet.getGames());
 
-        Boolean playerBWonSet = TennisMatchUtil.playerBWonSet(playerAGames, playerBGames);
+        Boolean playerBWonSet = TennisMatchUtil.playerBWonSet(playerASet.getGames(), playerBSet.getGames());
 
-        if( playerAWonSet || playerAWonSet ) {
+        if( playerAWonSet || playerBWonSet ) {
 
             if (playerAWonSet) {
-                tennisMatch.getCurrentSet(tennisMatch.getPlayerA()).setSetStatus(TennisSetStatus.Won);
-                tennisMatch.getCurrentSet(tennisMatch.getPlayerB()).setSetStatus(TennisSetStatus.Lost);
+                playerASet.setSetStatus(TennisSetStatus.Won);
+                playerBSet.setSetStatus(TennisSetStatus.Lost);
             }
             else if (playerBWonSet) {
-                tennisMatch.getCurrentSet(tennisMatch.getPlayerA()).setSetStatus(TennisSetStatus.Lost);
-                tennisMatch.getCurrentSet(tennisMatch.getPlayerB()).setSetStatus(TennisSetStatus.Won);
+                playerASet.setSetStatus(TennisSetStatus.Lost);
+                playerBSet.setSetStatus(TennisSetStatus.Won);
             }
 
             return true;
@@ -151,11 +151,11 @@ public class TennisMatchServiceImpl implements TennisMatchService {
                     break;
                 }
 
-                if ( checkPlayerWonSetAndUpdateStatus(tennisSetA.getGames(),
-                        tennisSetB.getGames()) ) {
+                if ( checkPlayerWonSetAndUpdateStatus(tennisSetA, tennisSetB) ) {
                     break;
                 }
             }
+            System.out.println("Hello");
 
         } while (!isItFifthSet(tennisMatch.getPlayerTennisSets(tennisMatch.getPlayerA()),
         tennisMatch.getPlayerTennisSets(tennisMatch.getPlayerB())));

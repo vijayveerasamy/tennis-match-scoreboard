@@ -14,7 +14,7 @@ public class TennisMatchUtil {
     }
 
     public static Integer getRandomNumber() {
-        return random.nextInt();
+        return random.nextInt(10);
     }
 
     public static boolean playerAAtDeuce(final Integer playerAScore, final Integer playerBScore) {
@@ -95,7 +95,7 @@ public class TennisMatchUtil {
     public static boolean playerBWonSet(final List<TennisGame> playerAGames, final List<TennisGame> playerBGames) {
 
         long playAGamesWonCount = playerAGames.stream().filter(g -> g.getCurrentScore()==50).count();
-        long playBGamesWonCount = playerAGames.stream().filter(g -> g.getCurrentScore()==50).count();
+        long playBGamesWonCount = playerBGames.stream().filter(g -> g.getCurrentScore()==50).count();
 
         if( playBGamesWonCount>=6 && (playBGamesWonCount-playAGamesWonCount>=2) ) {
             return true;
