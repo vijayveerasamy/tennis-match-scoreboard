@@ -188,13 +188,4 @@ public class TennisMatchServiceImpl implements TennisMatchService {
         tennisMatch.getPlayerTennisSets(tennisMatch.getPlayerB())));
 
     }
-
-
-    public static void main(String[] args) {
-        TennisMatch tennisMatch = new TennisMatch("Raphael Nadal", "Roger Federer");
-
-        TennisMatchService tennisMatchService = new TennisMatchServiceImpl(tennisMatch);
-
-        tennisMatchService.startMatch();
-    }
 }
