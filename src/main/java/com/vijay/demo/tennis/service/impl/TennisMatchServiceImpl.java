@@ -19,18 +19,44 @@ public class TennisMatchServiceImpl implements TennisMatchService {
     }
 
     @Override
-    public void playerAWonPoint() {
-
+    public String playerAWonPoint(TennisSet tennisSetA) {
+        return TennisScoreUtil.translateScoreValue(tennisSetA.getCurentGame().getCurrentScore());
     }
 
     @Override
-    public void playerBWonPoint() {
-
+    public String playerBWonPoint(TennisSet tennisSetB) {
+        return TennisScoreUtil.translateScoreValue(tennisSetB.getCurentGame().getCurrentScore());
     }
 
     @Override
-    public void currentScore() {
+    public void currentScore(List<TennisSet> tennisSetsA, List<TennisSet> tennisSetsB) {
 
+        Long playerASetsWon = tennisSetsA.stream().filter(s -> s.getSetStatus().equals(TennisSetStatus.Won)).count();
+        Long playerBSetsWon = tennisSetsB.stream().filter(s -> s.getSetStatus().equals(TennisSetStatus.Won)).count();
+
+        Long gamesWonCurrentSetA = tennisSetsA.get(tennisSetsA.size()-1).getGames().stream().filter(s -> s.getCurrentScore()==50).count();
+        Long gamesWonCurrentSetB = tennisSetsB.get(tennisSetsA.size()-1).getGames().stream().filter(s -> s.getCurrentScore()==50).count();
+
+        String playerAWonPoints = playerAWonPoint(tennisSetsA.get(tennisSetsA.size()-1));
+        String playerBWonPoints = playerBWonPoint(tennisSetsB.get(tennisSetsB.size()-1));
+
+        playerBWonPoint(tennisSetsA.get(tennisSetsB.size()-1));
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Current Score: ");
+        stringBuilder.append(playerASetsWon);
+        stringBuilder.append("/");
+        stringBuilder.append(playerBSetsWon);
+        stringBuilder.append(" ");
+        stringBuilder.append(gamesWonCurrentSetA);
+        stringBuilder.append("/");
+        stringBuilder.append(gamesWonCurrentSetB);
+        stringBuilder.append(" ");
+        stringBuilder.append(playerAWonPoints);
+        stringBuilder.append("/");
+        stringBuilder.append(playerBWonPoints);
+
+        System.out.println(stringBuilder.toString());
     }
 
     public Boolean isItTieBreakSet(TennisSet tennisSetA, TennisSet tennisSetB) {
@@ -155,7 +181,8 @@ public class TennisMatchServiceImpl implements TennisMatchService {
                     break;
                 }
             }
-            System.out.println("Hello");
+            currentScore(tennisMatch.getPlayerTennisSets(tennisMatch.getPlayerA()), tennisMatch.getPlayerTennisSets(tennisMatch.getPlayerB()) );
+            System.out.println("------------------------------------------");
 
         } while (!isItFifthSet(tennisMatch.getPlayerTennisSets(tennisMatch.getPlayerA()),
         tennisMatch.getPlayerTennisSets(tennisMatch.getPlayerB())));

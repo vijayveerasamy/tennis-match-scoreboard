@@ -67,9 +67,13 @@ public class TennisScoreUtil {
         String returnScore = null;
         switch (value) {
             case 0: returnScore="Love";
+            break;
             case 45: returnScore="AD";
+            break;
             case 50: returnScore="Game";
+            break;
             default: returnScore=value.toString();
+            break;
         }
         return returnScore;
     }
